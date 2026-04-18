@@ -1,0 +1,266 @@
+/* ═══════════════════════════════════════════════════════════════════
+   layout.css — Patrimônio Inteligente
+   Estrutura de layout: sidebar, header e área de conteúdo
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Variáveis de layout ───────────────────────────────────────────── */
+:root {
+  --sidebar-width:       260px;
+  --sidebar-width-mini:  72px;
+  --header-height:       64px;
+  --content-max-width:   1280px;
+}
+
+/* ── Shell do app ──────────────────────────────────────────────────── */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── Sidebar ────────────────────────────────────────────────────────── */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: var(--sidebar-width);
+  background-color: var(--color-primary-900);
+  color: var(--color-white);
+  display: flex;
+  flex-direction: column;
+  transition: width var(--transition-base);
+  z-index: var(--z-sticky);
+  overflow: hidden;
+}
+
+.sidebar.is-collapsed {
+  width: var(--sidebar-width-mini);
+}
+
+/* Cabeçalho da sidebar — logo e nome do sistema */
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-4);
+  height: var(--header-height);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebar__brand-logo {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  object-fit: contain;
+}
+
+.sidebar__brand-name {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
+  line-height: 1.2;
+}
+
+.sidebar__brand-sub {
+  font-size: var(--font-size-xs);
+  color: var(--color-primary-300);
+  margin-top: 2px;
+}
+
+/* Navegação */
+.sidebar__nav {
+  flex: 1;
+  padding: var(--space-4) 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.nav__section-title {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semi);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--color-primary-400);
+  padding: var(--space-4) var(--space-4) var(--space-2);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebar.is-collapsed .nav__section-title {
+  visibility: hidden;
+}
+
+.nav__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-primary-200);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-sm);
+  margin: 1px var(--space-2);
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+  white-space: nowrap;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.nav__item:hover {
+  background-color: rgba(255,255,255,.07);
+  color: var(--color-white);
+  text-decoration: none;
+}
+
+.nav__item.is-active {
+  background-color: var(--color-primary-600);
+  color: var(--color-white);
+}
+
+.nav__item-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* Rodapé da sidebar — info do usuário */
+.sidebar__footer {
+  padding: var(--space-4);
+  border-top: 1px solid rgba(255,255,255,.08);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.sidebar__user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
+  flex-shrink: 0;
+}
+
+.sidebar__user-name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white);
+}
+
+.sidebar__user-papel {
+  font-size: var(--font-size-xs);
+  color: var(--color-primary-400);
+}
+
+/* ── Header ─────────────────────────────────────────────────────────── */
+.app-header {
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-width);
+  right: 0;
+  height: var(--header-height);
+  background-color: var(--color-white);
+  border-bottom: 1px solid var(--color-gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-6);
+  z-index: var(--z-sticky);
+  transition: left var(--transition-base);
+  gap: var(--space-4);
+}
+
+.app-shell.sidebar-collapsed .app-header {
+  left: var(--sidebar-width-mini);
+}
+
+.header__page-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semi);
+  color: var(--color-gray-900);
+}
+
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-left: auto;
+}
+
+/* ── Área de conteúdo principal ─────────────────────────────────────── */
+.app-content {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  margin-top: var(--header-height);
+  min-height: calc(100vh - var(--header-height));
+  transition: margin-left var(--transition-base);
+}
+
+.app-shell.sidebar-collapsed .app-content {
+  margin-left: var(--sidebar-width-mini);
+}
+
+.content-inner {
+  max-width: var(--content-max-width);
+  padding: var(--space-8);
+}
+
+/* ── Breadcrumb ─────────────────────────────────────────────────────── */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+  margin-bottom: var(--space-6);
+}
+
+.breadcrumb__item + .breadcrumb__item::before {
+  content: '/';
+  margin-right: var(--space-2);
+  color: var(--color-gray-400);
+}
+
+.breadcrumb__item a {
+  color: var(--color-primary-600);
+}
+
+.breadcrumb__item.is-current {
+  color: var(--color-gray-900);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ── Responsividade ─────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform var(--transition-base), width var(--transition-base);
+  }
+
+  .sidebar.is-open {
+    transform: translateX(0);
+    width: var(--sidebar-width);
+  }
+
+  .app-header {
+    left: 0;
+  }
+
+  .app-content {
+    margin-left: 0;
+  }
+
+  .content-inner {
+    padding: var(--space-4);
+  }
+}

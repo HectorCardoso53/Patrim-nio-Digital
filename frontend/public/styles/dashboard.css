@@ -1,0 +1,59 @@
+.kpi-card__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-5);
+  margin-bottom: var(--space-8);
+}
+
+/* Cards de KPI para dashboard */
+
+
+.kpi-card__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.kpi-card__icon--blue   { background-color: var(--color-primary-100); color: var(--color-primary-600); }
+.kpi-card__icon--green  { background-color: var(--color-accent-100);  color: var(--color-accent-600);  }
+.kpi-card__icon--orange { background-color: var(--color-warning-bg);  color: var(--color-warning);     }
+.kpi-card__icon--red    { background-color: var(--color-danger-bg);   color: var(--color-danger);      }
+
+.kpi-card__label {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+  margin-bottom: var(--space-1);
+}
+
+.kpi-card__value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-gray-900);
+  line-height: 1;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-5);
+  margin-bottom: var(--space-8);
+}
+
+.table-wrapper--flat {
+  border: none;
+  border-radius: 0;
+}

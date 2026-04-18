@@ -1,0 +1,29 @@
+# ── Node ──────────────────────────────────
+node_modules/
+npm-debug.log*
+
+# ── Ambiente ──────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── Prisma ────────────────────────────────
+backend/prisma/migrations/*/migration.sql
+
+# ── Uploads ───────────────────────────────
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# ── Sistema operacional ────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Editores ──────────────────────────────
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# ── Logs ──────────────────────────────────
+logs/
+*.log

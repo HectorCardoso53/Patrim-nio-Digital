@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="../assets/logo.png">
+  <title>Login — Patrimônio Inteligente</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- CSS original do sistema (mantém variáveis e componentes) -->
+  <link rel="stylesheet" href="../styles/global.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0d1b2a 0%, #1a3a5c 60%, #1e5f8e 100%);
+      padding: 1rem;
+    }
+
+    .login-wrapper {
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .login-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 2.5rem 2rem 2rem;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    .login-logo {
+      width: 90px;
+      height: 90px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 1rem;
+    }
+
+    .login-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #0d1b2a;
+      text-align: center;
+      margin-bottom: 0.25rem;
+    }
+
+    .login-subtitle {
+      font-size: 0.9rem;
+      color: #6c757d;
+      text-align: center;
+      margin-bottom: 1.75rem;
+    }
+
+    .login-section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1a3a5c;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #e9ecef;
+    }
+
+    .form-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    .form-control {
+      border-radius: 8px;
+      border: 1.5px solid #dee2e6;
+      padding: 0.65rem 0.9rem;
+      font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-control:focus {
+      border-color: #1a3a5c;
+      box-shadow: 0 0 0 3px rgba(26, 58, 92, 0.15);
+    }
+
+    .btn-entrar {
+      background-color: #1a3a5c;
+      border: none;
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .btn-entrar:hover:not(:disabled) {
+      background-color: #0d1b2a;
+    }
+
+    .btn-entrar:active:not(:disabled) {
+      transform: scale(0.99);
+    }
+
+    .btn-entrar:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .login-footer {
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.6);
+      line-height: 1.6;
+    }
+
+    .alert {
+      border-radius: 8px;
+      font-size: 0.875rem;
+      display: none;
+    }
+
+    .alert.is-visible {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login-wrapper">
+    <div class="login-card">
+
+      <!-- Logo e título -->
+      <img src="../assets/logo.png" alt="Logo da Prefeitura de Oriximiná" class="login-logo" />
+      <h1 class="login-title">Patrimônio Inteligente</h1>
+      <p class="login-subtitle">Prefeitura Municipal de Oriximiná/PA</p>
+
+      <h2 class="login-section-title">Acesso ao sistema</h2>
+
+      <!-- Alertas -->
+      <div id="alert-info" class="alert alert-info" role="status" aria-live="polite"></div>
+      <div id="alert-error" class="alert alert-danger" role="alert" aria-live="assertive"></div>
+
+      <!-- Formulário -->
+      <div class="mb-3">
+        <label class="form-label" for="email">
+          E-mail institucional <span class="text-danger">*</span>
+        </label>
+        <input type="email" id="email" class="form-control" placeholder="usuario@oriximina.pa.gov.br"
+          autocomplete="email" required />
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label" for="senha">
+          Senha <span class="text-danger">*</span>
+        </label>
+        <input type="password" id="senha" class="form-control" placeholder="••••••••" autocomplete="current-password"
+          required />
+      </div>
+
+      <button id="btn-login" class="btn btn-primary btn-entrar w-100" type="button">
+        Entrar
+      </button>
+
+    </div>
+
+    <p class="login-footer">
+      Patrimônio Inteligente v1.0 &mdash; Sistema Interno<br />
+      Prefeitura Municipal de Oriximiná/PA &copy; 2025
+    </p>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="../scripts/pages/login.js"></script>
+
+</body>
+
+</html>

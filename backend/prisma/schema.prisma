@@ -1,0 +1,134 @@
+// ─────────────────────────────────────────────────────────────────────────────
+//  Patrimônio Inteligente — Schema Prisma
+//  Banco de dados: PostgreSQL
+// ─────────────────────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Enumerações ───────────────────────────────────────────────────────────────
+
+enum Papel {
+  ADMIN
+  GESTOR
+  OPERADOR
+  VISUALIZADOR
+}
+
+enum TipoPatrimonio {
+  MOVEL
+  IMOVEL
+}
+
+enum EstadoConservacao {
+  OTIMO
+  BOM
+  REGULAR
+  RUIM
+  INSERVIVEL
+}
+
+enum TipoMovimentacao {
+  CADASTRO
+  ATUALIZACAO
+  TRANSFERENCIA
+  MANUTENCAO
+  OCORRENCIA
+  BAIXA
+  PERMUTA
+}
+
+// ── Modelos ───────────────────────────────────────────────────────────────────
+
+model Secretaria {
+  id          String   @id @default(uuid())
+  nome        String   @unique
+  sigla       String   @unique
+  ativo       Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  usuarios    Usuario[]
+  patrimonios Patrimonio[]
+
+  @@map("secretarias")
+}
+
+model Usuario {
+  id           String   @id @default(uuid())
+  nome         String
+  email        String   @unique
+  senhaHash    String
+  papel        Papel    @default(OPERADOR)
+  ativo        Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  secretariaId String?
+  secretaria   Secretaria? @relation(fields: [secretariaId], references: [id])
+
+  movimentacoes Movimentacao[]
+  patrimoniosCriados Patrimonio[] @relation("CriadoPor")
+  patrimoniosResponsavel Patrimonio[] @relation("Responsavel")
+
+  @@map("usuarios")
+}
+
+model Patrimonio {
+  id                String            @id @default(uuid())
+  tombamento        String            @unique
+  descricao         String
+  tipo              TipoPatrimonio
+  marca             String?
+  modelo            String?
+  numeroSerie       String?
+  estadoConservacao EstadoConservacao
+  valorAquisicao    Decimal?          @db.Decimal(15, 2)
+  dataAquisicao     DateTime?
+  localizacao       String?
+  observacoes       String?
+  qrCode            String?           @db.Text  // Data URL base64 do QR Code
+  ativo             Boolean           @default(true)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  secretariaId  String
+  secretaria    Secretaria @relation(fields: [secretariaId], references: [id])
+
+  responsavelId String?
+  responsavel   Usuario?   @relation("Responsavel", fields: [responsavelId], references: [id])
+
+  createdById   String
+  createdBy     Usuario    @relation("CriadoPor", fields: [createdById], references: [id])
+
+  movimentacoes Movimentacao[]
+
+  @@index([tombamento])
+  @@index([secretariaId])
+  @@index([tipo])
+  @@index([estadoConservacao])
+  @@index([descricao])
+  @@map("patrimonios")
+}
+
+model Movimentacao {
+  id           String           @id @default(uuid())
+  tipo         TipoMovimentacao
+  descricao    String
+  createdAt    DateTime         @default(now())
+
+  patrimonioId String
+  patrimonio   Patrimonio @relation(fields: [patrimonioId], references: [id])
+
+  usuarioId    String
+  usuario      Usuario    @relation(fields: [usuarioId], references: [id])
+
+  @@index([patrimonioId])
+  @@map("movimentacoes")
+}

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detalhe do Bem — Patrimônio Inteligente</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles/global.css" />
+  <link rel="stylesheet" href="../styles/layout.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+  <style>
+    .content-inner {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .app-shell {
+      min-height: unset !important;
+      height: auto !important;
+    }
+
+    .app-content {
+      min-height: unset !important;
+      height: auto !important;
+      padding-bottom: 32px;
+    }
+
+    .detalhe-grid {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: var(--space-6);
+      align-items: flex-start;
+    }
+
+    @media (max-width: 1024px) {
+      .detalhe-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .dado-label {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semi);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--color-gray-500);
+      margin-bottom: var(--space-1);
+    }
+
+    .dado-valor {
+      font-size: var(--font-size-base);
+      color: var(--color-gray-900);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .dado-grupo {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: var(--space-5) var(--space-8);
+      padding: var(--space-6);
+    }
+
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .timeline__item {
+      display: flex;
+      gap: var(--space-4);
+      position: relative;
+      padding-bottom: var(--space-5);
+    }
+
+    .timeline__item:last-child {
+      padding-bottom: 0;
+    }
+
+    .timeline__item:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 32px;
+      bottom: 0;
+      width: 2px;
+      background-color: var(--color-gray-200);
+    }
+
+    .timeline__dot {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      background-color: var(--color-primary-100);
+      border: 2px solid var(--color-primary-300);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--color-primary-700);
+      z-index: 1;
+    }
+
+    .timeline__body {
+      flex: 1;
+      padding-top: var(--space-1);
+    }
+
+    .timeline__tipo {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semi);
+      color: var(--color-gray-900);
+    }
+
+    .timeline__descricao {
+      font-size: var(--font-size-sm);
+      color: var(--color-gray-600);
+      margin-top: 2px;
+    }
+
+    .timeline__meta {
+      font-size: var(--font-size-xs);
+      color: var(--color-gray-400);
+      margin-top: var(--space-1);
+    }
+
+    .qr-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-6);
+      text-align: center;
+    }
+
+    .qr-container img {
+      width: 200px;
+      height: 200px;
+      border: 1px solid var(--color-gray-200);
+      border-radius: var(--radius-md);
+    }
+
+    .qr-tombamento {
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-primary-700);
+      letter-spacing: .05em;
+    }
+
+    .sidebar__brand-logo-img {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 3px;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-shell" id="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Menu de navegação">
+      <div class="sidebar__brand">
+        <img src="../assets/logo.png" alt="Logo Prefeitura" class="sidebar__brand-logo-img" />
+        <div>
+          <div class="sidebar__brand-name">Patrimônio Inteligente</div>
+          <div class="sidebar__brand-sub">Oriximiná/PA</div>
+        </div>
+      </div>
+      <nav class="sidebar__nav" aria-label="Navegação principal">
+        <span class="nav__section-title">Menu Principal</span>
+        <a href="dashboard.html" class="nav__item">
+          <svg class="nav__item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+          </svg>
+          <span>Dashboard</span>
+        </a>
+        <span class="nav__section-title">Patrimônio</span>
+        <a href="patrimonio-listagem.html" class="nav__item is-active">
+          <svg class="nav__item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            aria-hidden="true">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+            <rect x="9" y="3" width="6" height="4" rx="1" />
+            <path d="M9 12h6M9 16h4" />
+          </svg>
+          <span>Bens Patrimoniais</span>
+        </a>
+        <a href="patrimonio-cadastro.html" class="nav__item">
+          <svg class="nav__item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 8v8M8 12h8" />
+          </svg>
+          <span>Novo Tombamento</span>
+        </a>
+      </nav>
+      <div class="sidebar__footer">
+        <div class="sidebar__user-avatar" id="user-avatar" aria-hidden="true">--</div>
+        <div>
+          <div class="sidebar__user-name" id="user-name">Carregando...</div>
+          <div class="sidebar__user-papel" id="user-papel"></div>
+        </div>
+      </div>
+    </aside>
+
+    <header class="app-header" role="banner">
+      <button id="btn-toggle-sidebar" class="btn btn-ghost btn-icon" aria-label="Recolher menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          aria-hidden="true">
+          <path d="M3 12h18M3 6h18M3 18h18" />
+        </svg>
+      </button>
+      <h1 class="header__page-title" id="header-tombamento">Carregando...</h1>
+      <div class="header__actions">
+        <button id="btn-editar" class="btn btn-secondary btn-sm is-hidden" type="button">
+          <i class="bi bi-pencil"></i> Editar
+        </button>
+        <button id="btn-imprimir-qr" class="btn btn-secondary btn-sm is-hidden" type="button">
+          <i class="bi bi-printer"></i> Imprimir Etiqueta
+        </button>
+        <button id="btn-logout" class="btn btn-ghost btn-sm" type="button" aria-label="Sair do sistema">
+          <i class="bi bi-box-arrow-right"></i> Sair
+        </button>
+      </div>
+    </header>
+
+    <main class="app-content" id="main-content" role="main">
+      <div class="content-inner">
+        <nav class="breadcrumb" aria-label="Localização">
+          <span class="breadcrumb__item"><a href="dashboard.html">Início</a></span>
+          <span class="breadcrumb__item"><a href="patrimonio-listagem.html">Bens Patrimoniais</a></span>
+          <span class="breadcrumb__item is-current" id="breadcrumb-atual">Detalhe</span>
+        </nav>
+
+        <div id="estado-carregando" class="empty-state">
+          <span class="spinner" style="width:48px;height:48px;" aria-label="Carregando bem..."></span>
+          <p class="empty-state__text">Buscando informações do bem...</p>
+        </div>
+
+        <div id="estado-erro" class="is-hidden">
+          <div class="empty-state">
+            <svg class="empty-state__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+              aria-hidden="true">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="15" y1="9" x2="9" y2="15" />
+              <line x1="9" y1="9" x2="15" y2="15" />
+            </svg>
+            <p class="empty-state__title">Bem não encontrado</p>
+            <p class="empty-state__text">O bem patrimonial solicitado não existe ou foi removido do sistema.</p>
+            <a href="patrimonio-listagem.html" class="btn btn-primary">Voltar ao inventário</a>
+          </div>
+        </div>
+
+        <div id="conteudo-bem" class="is-hidden">
+          <div class="detalhe-grid">
+            <div>
+              <div class="card" style="margin-bottom: var(--space-5);">
+                <div class="card__header">
+                  <h3 class="card__title">Identificação</h3>
+                  <div style="display:flex;gap:var(--space-2);align-items:center;">
+                    <span id="badge-tipo" class="badge"></span>
+                    <span id="badge-estado" class="badge"></span>
+                  </div>
+                </div>
+                <div class="dado-grupo" id="dados-identificacao"></div>
+              </div>
+              <div class="card" style="margin-bottom: var(--space-5);">
+                <div class="card__header">
+                  <h3 class="card__title">Localização e Responsabilidade</h3>
+                </div>
+                <div class="dado-grupo" id="dados-localizacao"></div>
+              </div>
+              <div class="card">
+                <div class="card__header">
+                  <h3 class="card__title">Histórico de Movimentações</h3>
+                </div>
+                <div class="card__body">
+                  <div class="timeline" id="timeline-movimentacoes"></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="card" style="position:sticky;top:calc(var(--header-height) + var(--space-6));">
+                <div class="card__header">
+                  <h3 class="card__title">QR Code de Identificação</h3>
+                </div>
+                <div class="qr-container">
+                  <img id="qr-code-img" src="" alt="QR Code do bem patrimonial" />
+                  <p class="qr-tombamento" id="qr-tombamento">—</p>
+                  <p class="text-muted text-small">Aponte a câmera para acessar este bem diretamente.</p>
+                  <button id="btn-imprimir-qr-lateral" class="btn btn-secondary btn-sm" type="button"
+                    style="width:100%;">
+                    <i class="bi bi-printer"></i> Imprimir Etiqueta
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
+  <script type="module" src="../scripts/pages/detalhe.js"></script>
+</body>
+
+</html>
