@@ -1,84 +1,54 @@
 /**
  * api/patrimonio.api.js
- * Chamadas HTTP do módulo de patrimônio.
  */
 
-import { api } from "./client.js";
+import { api } from './client.js';
+import { getToken } from '../auth/session.js';
 
-/**
- * Converte um objeto de filtros em query string.
- * @param {object} filtros
- * @returns {string}
- */
 function toQueryString(filtros) {
   const params = new URLSearchParams();
   Object.entries(filtros).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
+    if (value !== undefined && value !== null && value !== '') {
       params.append(key, value);
     }
   });
   const qs = params.toString();
-  return qs ? `?${qs}` : "";
+  return qs ? `?${qs}` : '';
 }
 
 export const patrimonioApi = {
-  /**
-   * Lista bens com filtros e paginação.
-   * @param {object} filtros - { page, limit, secretariaId, tipo, estado, busca }
-   */
+
   async listar(filtros = {}) {
     const qs = toQueryString(filtros);
-    const resp = await api.get(`/patrimonio${qs}`);
-    return resp; // { data: [], meta: { page, limit, total, totalPages } }
+    return await api.get(`/patrimonio${qs}`);
   },
 
-  /**
-   * Busca um bem pelo ID (UUID) ou tombamento.
-   * @param {string} identificador
-   */
   async buscar(identificador) {
     const resp = await api.get(`/patrimonio/${identificador}`);
-    return resp.data.patrimonio;
+    return resp.data?.patrimonio;
   },
 
-  /**
-   * Cria um novo bem patrimonial.
-   * @param {object} dados
-   */
   async criar(dados) {
-    const resp = await api.post("/patrimonio", dados);
-    return resp.data.patrimonio;
+    const resp = await api.post('/patrimonio', dados);
+    return resp.data?.patrimonio;
   },
 
-  /**
-   * Atualiza um bem patrimonial.
-   * @param {string} id
-   * @param {object} dados
-   */
   async atualizar(id, dados) {
     const resp = await api.put(`/patrimonio/${id}`, dados);
-    return resp.data.patrimonio;
-  },
-
-  /**
-   * Retorna indicadores para o dashboard.
-   */
-  async indicadores() {
-    const resp = await api.get("/patrimonio/dashboard/indicadores");
-    return resp.data;
-  },
-
-  async buscar(id) {
-    const resp = await api.get(`/patrimonio/${id}`);
     return resp.data?.patrimonio;
+  },
+
+  async indicadores() {
+    const resp = await api.get('/patrimonio/dashboard/indicadores');
+    return resp.data;
   },
 
   async uploadFoto(id, file) {
     const formData = new FormData();
-    formData.append("foto", file);
+    formData.append('foto', file);
     const token = getToken();
     const response = await fetch(`/api/upload/foto/${id}`, {
-      method: "POST",
+      method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
     });
