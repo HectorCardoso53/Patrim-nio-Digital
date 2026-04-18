@@ -3,7 +3,7 @@
  * Chamadas HTTP do módulo de patrimônio.
  */
 
-import { api } from './client.js';
+import { api } from "./client.js";
 
 /**
  * Converte um objeto de filtros em query string.
@@ -13,12 +13,12 @@ import { api } from './client.js';
 function toQueryString(filtros) {
   const params = new URLSearchParams();
   Object.entries(filtros).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== '') {
+    if (value !== undefined && value !== null && value !== "") {
       params.append(key, value);
     }
   });
   const qs = params.toString();
-  return qs ? `?${qs}` : '';
+  return qs ? `?${qs}` : "";
 }
 
 export const patrimonioApi = {
@@ -46,7 +46,7 @@ export const patrimonioApi = {
    * @param {object} dados
    */
   async criar(dados) {
-    const resp = await api.post('/patrimonio', dados);
+    const resp = await api.post("/patrimonio", dados);
     return resp.data.patrimonio;
   },
 
@@ -64,7 +64,26 @@ export const patrimonioApi = {
    * Retorna indicadores para o dashboard.
    */
   async indicadores() {
-    const resp = await api.get('/patrimonio/dashboard/indicadores');
+    const resp = await api.get("/patrimonio/dashboard/indicadores");
     return resp.data;
+  },
+
+  async buscar(id) {
+    const resp = await api.get(`/patrimonio/${id}`);
+    return resp.data?.patrimonio;
+  },
+
+  async uploadFoto(id, file) {
+    const formData = new FormData();
+    formData.append("foto", file);
+    const token = getToken();
+    const response = await fetch(`/api/upload/foto/${id}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+    const body = await response.json();
+    if (!response.ok) throw new Error(body.message);
+    return body.data;
   },
 };
