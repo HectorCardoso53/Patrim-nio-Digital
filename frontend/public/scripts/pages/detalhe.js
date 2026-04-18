@@ -118,14 +118,16 @@ function renderBem(bem) {
     document.getElementById("qr-tombamento").textContent = bem.tombamento;
   }
 
-  // Foto
   if (bem.foto) {
     const cardFoto = document.getElementById("card-foto");
     const imgFoto = document.getElementById("foto-bem");
-    imgFoto.src = bem.foto;
-    cardFoto.classList.remove("is-hidden");
+    if (cardFoto && imgFoto) {
+      imgFoto.src = bem.foto;
+      cardFoto.classList.remove("is-hidden");
+      cardFoto.style.display = "block";
+    }
   }
-  
+
   // Movimentações
   renderTimeline(bem.movimentacoes || []);
 
