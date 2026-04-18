@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Consulta de Bem — Prefeitura de Oriximiná/PA</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background: #f0f2f5;
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header-pub {
+      background: #0d1b2a;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-pub img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.1);
+      padding: 3px;
+    }
+
+    .header-pub .title {
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .header-pub .subtitle {
+      color: rgba(255,255,255,0.5);
+      font-size: 0.72rem;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .bem-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 520px;
+      overflow: hidden;
+    }
+
+    .bem-card-header {
+      background: #0d1b2a;
+      padding: 20px 24px;
+      color: #fff;
+    }
+
+    .bem-card-header .tombamento {
+      font-family: monospace;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #7dd3fc;
+    }
+
+    .bem-card-header .descricao {
+      font-size: 1rem;
+      margin-top: 4px;
+      color: rgba(255,255,255,0.85);
+    }
+
+    .bem-card-body {
+      padding: 20px 24px;
+    }
+
+    .dado-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 10px 0;
+      border-bottom: 1px solid #f3f4f6;
+      gap: 12px;
+    }
+
+    .dado-row:last-child { border-bottom: none; }
+
+    .dado-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #9ca3af;
+      flex-shrink: 0;
+    }
+
+    .dado-valor {
+      font-size: 0.9rem;
+      color: #111827;
+      font-weight: 500;
+      text-align: right;
+    }
+
+    .badge-estado {
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .badge-otimo    { background: #d1fae5; color: #065f46; }
+    .badge-bom      { background: #dbeafe; color: #1e40af; }
+    .badge-regular  { background: #fef3c7; color: #92400e; }
+    .badge-ruim     { background: #fee2e2; color: #991b1b; }
+    .badge-inservivel { background: #f3f4f6; color: #374151; }
+
+    .footer-pub {
+      text-align: center;
+      padding: 16px;
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+
+    /* Loading e erro */
+    .estado-loading, .estado-erro {
+      text-align: center;
+      padding: 40px 24px;
+    }
+
+    .estado-erro i { font-size: 2.5rem; color: #fca5a5; margin-bottom: 12px; display: block; }
+  </style>
+</head>
+<body>
+
+  <div class="header-pub">
+    <img src="../assets/logo.png" alt="Logo Prefeitura" />
+    <div>
+      <div class="title">Patrimônio Inteligente</div>
+      <div class="subtitle">Prefeitura Municipal de Oriximiná/PA</div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="bem-card">
+
+      <!-- Carregando -->
+      <div id="estado-carregando" class="estado-loading">
+        <div class="spinner-border text-primary mb-3" role="status"></div>
+        <p class="text-muted">Buscando informações do bem...</p>
+      </div>
+
+      <!-- Erro -->
+      <div id="estado-erro" class="estado-erro" style="display:none">
+        <i class="bi bi-x-circle"></i>
+        <h5 class="mb-2">Bem não encontrado</h5>
+        <p class="text-muted mb-0">Este patrimônio não existe ou foi baixado do inventário.</p>
+      </div>
+
+      <!-- Dados do bem -->
+      <div id="conteudo-bem" style="display:none">
+        <div class="bem-card-header">
+          <div class="tombamento" id="pub-tombamento">—</div>
+          <div class="descricao" id="pub-descricao">—</div>
+        </div>
+        <div class="bem-card-body">
+          <div class="dado-row">
+            <span class="dado-label">Secretaria</span>
+            <span class="dado-valor" id="pub-secretaria">—</span>
+          </div>
+          <div class="dado-row">
+            <span class="dado-label">Tipo</span>
+            <span class="dado-valor" id="pub-tipo">—</span>
+          </div>
+          <div class="dado-row">
+            <span class="dado-label">Estado</span>
+            <span class="dado-valor" id="pub-estado">—</span>
+          </div>
+          <div class="dado-row">
+            <span class="dado-label">Marca / Modelo</span>
+            <span class="dado-valor" id="pub-marca-modelo">—</span>
+          </div>
+          <div class="dado-row">
+            <span class="dado-label">Localização</span>
+            <span class="dado-valor" id="pub-localizacao">—</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer-pub">
+    Patrimônio Inteligente v1.0 — Sistema Interno<br/>
+    Prefeitura Municipal de Oriximiná/PA © 2025
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const tombamento = params.get('tombamento');
+
+    if (!tombamento) {
+      document.getElementById('estado-carregando').style.display = 'none';
+      document.getElementById('estado-erro').style.display = 'block';
+    } else {
+      fetch(`/api/publico/patrimonio/${tombamento}`)
+        .then(r => r.json())
+        .then(resp => {
+          if (!resp.success || !resp.data) throw new Error();
+
+          const b = resp.data;
+
+          document.getElementById('pub-tombamento').textContent = b.tombamento;
+          document.getElementById('pub-descricao').textContent  = b.descricao;
+          document.getElementById('pub-secretaria').textContent = b.secretaria?.nome || '—';
+          document.getElementById('pub-tipo').textContent       = b.tipo === 'MOVEL' ? 'Móvel' : 'Imóvel';
+          document.getElementById('pub-localizacao').textContent = b.localizacao || '—';
+
+          const marcaModelo = [b.marca, b.modelo].filter(Boolean).join(' / ') || '—';
+          document.getElementById('pub-marca-modelo').textContent = marcaModelo;
+
+          const estadoMap = {
+            OTIMO: ['badge-otimo', 'Ótimo'],
+            BOM: ['badge-bom', 'Bom'],
+            REGULAR: ['badge-regular', 'Regular'],
+            RUIM: ['badge-ruim', 'Ruim'],
+            INSERVIVEL: ['badge-inservivel', 'Inservível'],
+          };
+          const [cls, label] = estadoMap[b.estadoConservacao] || ['badge-bom', b.estadoConservacao];
+          document.getElementById('pub-estado').innerHTML = `<span class="badge-estado ${cls}">${label}</span>`;
+
+          document.getElementById('estado-carregando').style.display = 'none';
+          document.getElementById('conteudo-bem').style.display = 'block';
+        })
+        .catch(() => {
+          document.getElementById('estado-carregando').style.display = 'none';
+          document.getElementById('estado-erro').style.display = 'block';
+        });
+    }
+  </script>
+
+</body>
+</html>
