@@ -9,77 +9,11 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="../styles/global.css" />
   <link rel="stylesheet" href="../styles/components.css" />
-  <style>
-    :root { --sidebar-width:240px; --sidebar-bg:#0d1b2a; --sidebar-hover:#1a3a5c; --sidebar-active:#1e5f8e; }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;color:#1a1a2e}
-
-    .sidebar{position:fixed;top:0;left:0;width:var(--sidebar-width);height:100vh;background:var(--sidebar-bg);display:flex;flex-direction:column;z-index:100;transition:width .25s;overflow:hidden}
-    .sidebar.collapsed{width:60px}
-    .sidebar.collapsed .sidebar-label,.sidebar.collapsed .brand-text,.sidebar.collapsed .nav-section,.sidebar.collapsed .user-info{display:none}
-    .sidebar.collapsed .brand-logo{margin:0 auto}
-    .sidebar-brand{display:flex;align-items:center;gap:10px;padding:16px 14px;border-bottom:1px solid rgba(255,255,255,.08);min-height:72px}
-    .brand-logo{width:40px;height:40px;object-fit:contain;flex-shrink:0;border-radius:8px;background:rgba(255,255,255,.08);padding:4px}
-    .brand-text .brand-name{font-size:.9rem;font-weight:700;color:#fff;line-height:1.2}
-    .brand-text .brand-sub{font-size:.72rem;color:rgba(255,255,255,.5)}
-    .sidebar-nav{flex:1;padding:12px 8px;overflow-y:auto}
-    .nav-section{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.35);padding:10px 8px 4px}
-    .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:rgba(255,255,255,.7);text-decoration:none;font-size:.875rem;font-weight:500;transition:background .15s,color .15s;margin-bottom:2px}
-    .nav-item:hover{background:var(--sidebar-hover);color:#fff}
-    .nav-item.active{background:var(--sidebar-active);color:#fff}
-    .nav-item i{font-size:1rem;flex-shrink:0;width:20px;text-align:center}
-    .sidebar-footer{padding:12px 14px;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px}
-    .user-avatar{width:34px;height:34px;border-radius:50%;background:var(--sidebar-active);color:#fff;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .user-info .user-name{font-size:.8rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
-    .user-info .user-papel{font-size:.68rem;color:rgba(255,255,255,.45)}
-
-    .app-wrapper{margin-left:var(--sidebar-width);min-height:100vh;display:flex;flex-direction:column;transition:margin-left .25s}
-    .app-wrapper.expanded{margin-left:60px}
-
-    .app-header{position:sticky;top:0;height:56px;background:#fff;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;padding:0 24px;gap:12px;z-index:90;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-    .btn-toggle{background:none;border:none;padding:6px;border-radius:6px;cursor:pointer;color:#6b7280;font-size:1.2rem;transition:background .15s}
-    .btn-toggle:hover{background:#f3f4f6}
-    .header-title{font-size:1rem;font-weight:600;color:#111827;flex:1}
-    .btn-logout{display:flex;align-items:center;gap:6px;padding:6px 14px;border:1.5px solid #e5e7eb;border-radius:8px;background:#fff;color:#374151;font-size:.85rem;font-weight:500;cursor:pointer;transition:all .15s}
-    .btn-logout:hover{background:#fef2f2;border-color:#fca5a5;color:#dc2626}
-
-    .app-content{flex:1;padding:28px 28px 40px}
-    .page-title{font-size:1.4rem;font-weight:700;color:#111827}
-    .page-subtitle{font-size:.85rem;color:#6b7280;margin-top:2px}
-
-    /* Filtros */
-    .filter-card{background:#fff;border-radius:12px;border:1px solid #e5e7eb;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:20px}
-
-    /* Tabela */
-    .table-card{background:#fff;border-radius:12px;border:1px solid #e5e7eb;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden}
-    .table-card-header{padding:16px 20px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between}
-    .table-card-header h3{font-size:.95rem;font-weight:600;color:#111827}
-    .table{margin:0;font-size:.875rem}
-    .table thead th{background:#f9fafb;color:#6b7280;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:10px 16px;border-bottom:1px solid #e5e7eb}
-    .table tbody td{padding:11px 16px;color:#374151;border-bottom:1px solid #f3f4f6;vertical-align:middle}
-    .table tbody tr:last-child td{border-bottom:none}
-    .table tbody tr:hover td{background:#f9fafb;cursor:pointer}
-
-    .tombamento-code{font-family:monospace;font-size:.8rem;background:#f3f4f6;padding:2px 8px;border-radius:4px;color:#374151;white-space:nowrap}
-    .badge-estado{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:600}
-    .badge-otimo{background:#d1fae5;color:#065f46}
-    .badge-bom{background:#dbeafe;color:#1e40af}
-    .badge-regular{background:#fef3c7;color:#92400e}
-    .badge-ruim{background:#fee2e2;color:#991b1b}
-    .badge-inservivel{background:#f3f4f6;color:#374151}
-    .badge-movel{background:#ede9fe;color:#5b21b6}
-    .badge-imovel{background:#fce7f3;color:#9d174d}
-
-    /* Paginação */
-    .paginacao{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid #f3f4f6;font-size:.82rem;color:#6b7280}
-    .paginacao-btns{display:flex;gap:4px}
-    .paginacao-btns button{width:32px;height:32px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;color:#374151;font-size:.82rem;cursor:pointer;transition:all .15s}
-    .paginacao-btns button:hover:not(:disabled){background:#f3f4f6}
-    .paginacao-btns button.active{background:#1a3a5c;color:#fff;border-color:#1a3a5c}
-    .paginacao-btns button:disabled{opacity:.4;cursor:not-allowed}
-  </style>
+  <link rel="stylesheet" href="../styles/listagem.css" />
 </head>
 <body>
+
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-brand">
@@ -91,10 +25,19 @@
   </div>
   <nav class="sidebar-nav">
     <div class="nav-section sidebar-label">Menu Principal</div>
-    <a href="dashboard.html" class="nav-item"><i class="bi bi-grid-1x2-fill"></i><span class="sidebar-label">Dashboard</span></a>
+    <a href="dashboard.html" class="nav-item">
+      <i class="bi bi-grid-1x2-fill"></i>
+      <span class="sidebar-label">Dashboard</span>
+    </a>
     <div class="nav-section sidebar-label">Patrimônio</div>
-    <a href="patrimonio-listagem.html" class="nav-item active"><i class="bi bi-clipboard2-data"></i><span class="sidebar-label">Bens Patrimoniais</span></a>
-    <a href="patrimonio-cadastro.html" class="nav-item"><i class="bi bi-plus-circle"></i><span class="sidebar-label">Novo Tombamento</span></a>
+    <a href="patrimonio-listagem.html" class="nav-item active">
+      <i class="bi bi-clipboard2-data"></i>
+      <span class="sidebar-label">Bens Patrimoniais</span>
+    </a>
+    <a href="patrimonio-cadastro.html" class="nav-item">
+      <i class="bi bi-plus-circle"></i>
+      <span class="sidebar-label">Novo Tombamento</span>
+    </a>
   </nav>
   <div class="sidebar-footer">
     <div class="user-avatar" id="user-avatar">--</div>
@@ -107,12 +50,18 @@
 
 <div class="app-wrapper" id="app-wrapper">
   <header class="app-header">
-    <button class="btn-toggle" id="btn-toggle-sidebar"><i class="bi bi-list"></i></button>
+    <button class="btn-toggle" id="btn-toggle-sidebar" aria-label="Abrir/fechar menu">
+      <i class="bi bi-list"></i>
+    </button>
     <span class="header-title">Bens Patrimoniais</span>
     <a href="patrimonio-cadastro.html" class="btn btn-sm btn-primary me-2" style="border-radius:8px;font-size:.85rem">
-      <i class="bi bi-plus-lg me-1"></i> Novo Tombamento
+      <i class="bi bi-plus-lg"></i>
+      <span class="btn-novo-txt ms-1">Novo Tombamento</span>
     </a>
-    <button class="btn-logout" id="btn-logout"><i class="bi bi-box-arrow-right"></i> Sair</button>
+    <button class="btn-logout" id="btn-logout">
+      <i class="bi bi-box-arrow-right"></i>
+      <span>Sair</span>
+    </button>
   </header>
 
   <main class="app-content">
@@ -157,7 +106,7 @@
           </select>
         </div>
         <div class="col-4 col-md-1">
-          <button id="btn-limpar-filtros" class="btn btn-sm btn-outline-secondary w-100" style="border-radius:8px">
+          <button id="btn-limpar-filtros" class="btn btn-sm btn-outline-secondary w-100" style="border-radius:8px" title="Limpar filtros">
             <i class="bi bi-x-lg"></i>
           </button>
         </div>
@@ -184,9 +133,11 @@
             </tr>
           </thead>
           <tbody id="tabela-patrimonios">
-            <tr><td colspan="8" class="text-center py-4 text-muted">
-              <div class="spinner-border spinner-border-sm me-2"></div>Carregando...
-            </td></tr>
+            <tr>
+              <td colspan="8" class="text-center py-4 text-muted">
+                <div class="spinner-border spinner-border-sm me-2"></div>Carregando...
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -200,11 +151,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script type="module" src="../scripts/pages/listagem.js"></script>
-<script>
-  document.getElementById('btn-toggle-sidebar').addEventListener('click', () => {
-    document.getElementById('sidebar').classList.toggle('collapsed');
-    document.getElementById('app-wrapper').classList.toggle('expanded');
-  });
-</script>
+
 </body>
 </html>

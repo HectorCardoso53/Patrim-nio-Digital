@@ -1,6 +1,5 @@
 /**
  * pages/listagem.js
- * Lógica da página de listagem de bens patrimoniais.
  */
 
 import { requireAuth, logout }   from '../auth/guard.js';
@@ -12,19 +11,13 @@ import { formatMoeda, formatData, formatEstadoConservacao,
 
 requireAuth();
 
-// ── Estado da listagem ─────────────────────────────────────────────────────
+// ── Estado ───────────────────────────────────────────────────────────
 const estado = {
-  page:        1,
-  limit:       20,
-  total:       0,
-  totalPages:  0,
-  busca:       '',
-  tipo:        '',
-  estado:      '',
-  secretariaId: '',
+  page: 1, limit: 20, total: 0, totalPages: 0,
+  busca: '', tipo: '', estado: '', secretariaId: '',
 };
 
-// ── Elementos do DOM ───────────────────────────────────────────────────────
+// ── DOM ──────────────────────────────────────────────────────────────
 const tbody         = document.getElementById('tabela-patrimonios');
 const totalLabel    = document.getElementById('total-registros');
 const paginacaoInfo = document.getElementById('paginacao-info');
@@ -34,8 +27,11 @@ const filtroTipo    = document.getElementById('filtro-tipo');
 const filtroEstado  = document.getElementById('filtro-estado');
 const filtroSec     = document.getElementById('filtro-secretaria');
 const btnLimpar     = document.getElementById('btn-limpar-filtros');
+const sidebar       = document.getElementById('sidebar');
+const appWrapper    = document.getElementById('app-wrapper');
+const overlay       = document.getElementById('sidebar-overlay');
 
-// ── Usuário ────────────────────────────────────────────────────────────────
+// ── Usuário ──────────────────────────────────────────────────────────
 const usuario = getUser();
 if (usuario) {
   document.getElementById('user-name').textContent   = usuario.nome;
@@ -43,124 +39,103 @@ if (usuario) {
   document.getElementById('user-avatar').textContent = formatIniciais(usuario.nome);
 }
 
-// ── Sidebar e logout ───────────────────────────────────────────────────────
+// ── Sidebar toggle ───────────────────────────────────────────────────
 document.getElementById('btn-toggle-sidebar').addEventListener('click', () => {
-  document.getElementById('app-shell').classList.toggle('sidebar-collapsed');
-  document.getElementById('sidebar').classList.toggle('is-collapsed');
+  const isMobile = window.innerWidth <= 1024;
+  if (isMobile) {
+    sidebar.classList.toggle('mobile-open');
+    overlay.classList.toggle('visible');
+  } else {
+    sidebar.classList.toggle('collapsed');
+    appWrapper.classList.toggle('expanded');
+  }
 });
+
+overlay.addEventListener('click', () => {
+  sidebar.classList.remove('mobile-open');
+  overlay.classList.remove('visible');
+});
+
+// ── Logout ───────────────────────────────────────────────────────────
 document.getElementById('btn-logout').addEventListener('click', () => logout());
 
-// ── Carregar secretarias no filtro ─────────────────────────────────────────
+// ── Secretarias ──────────────────────────────────────────────────────
 async function carregarSecretarias() {
   try {
     const resp = await api.get('/secretarias');
-    const secretarias = resp.data || [];
-    secretarias.forEach((s) => {
+    (resp.data || []).forEach((s) => {
       const opt = document.createElement('option');
       opt.value = s.id;
       opt.textContent = s.sigla;
       filtroSec.appendChild(opt);
     });
-  } catch {
-    // Secretarias não críticas para a listagem — falha silenciosa
-  }
+  } catch { /* falha silenciosa */ }
 }
 
-// ── Filtros com debounce ───────────────────────────────────────────────────
+// ── Filtros ───────────────────────────────────────────────────────────
 let debounceTimer;
 filtroBusca.addEventListener('input', () => {
   clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(() => {
-    estado.busca = filtroBusca.value.trim();
-    estado.page  = 1;
-    carregar();
-  }, 400);
+  debounceTimer = setTimeout(() => { estado.busca = filtroBusca.value.trim(); estado.page = 1; carregar(); }, 400);
 });
 
-filtroTipo.addEventListener('change',   () => { estado.tipo = filtroTipo.value;   estado.page = 1; carregar(); });
-filtroEstado.addEventListener('change', () => { estado.estado = filtroEstado.value; estado.page = 1; carregar(); });
-filtroSec.addEventListener('change',    () => { estado.secretariaId = filtroSec.value; estado.page = 1; carregar(); });
+filtroTipo.addEventListener('change',   () => { estado.tipo        = filtroTipo.value;   estado.page = 1; carregar(); });
+filtroEstado.addEventListener('change', () => { estado.estado      = filtroEstado.value; estado.page = 1; carregar(); });
+filtroSec.addEventListener('change',    () => { estado.secretariaId = filtroSec.value;   estado.page = 1; carregar(); });
 
 btnLimpar.addEventListener('click', () => {
-  filtroBusca.value  = '';
-  filtroTipo.value   = '';
-  filtroEstado.value = '';
-  filtroSec.value    = '';
+  filtroBusca.value = filtroTipo.value = filtroEstado.value = filtroSec.value = '';
   Object.assign(estado, { busca: '', tipo: '', estado: '', secretariaId: '', page: 1 });
   carregar();
 });
 
-// ── Carregar dados ─────────────────────────────────────────────────────────
+// ── Carregar ──────────────────────────────────────────────────────────
 async function carregar() {
-  renderCarregando();
+  tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted">
+    <div class="spinner-border spinner-border-sm me-2"></div>Carregando...</td></tr>`;
 
   try {
     const resp = await patrimonioApi.listar({
-      page:        estado.page,
-      limit:       estado.limit,
-      busca:       estado.busca       || undefined,
-      tipo:        estado.tipo        || undefined,
-      estado:      estado.estado      || undefined,
+      page: estado.page, limit: estado.limit,
+      busca: estado.busca || undefined,
+      tipo: estado.tipo || undefined,
+      estado: estado.estado || undefined,
       secretariaId: estado.secretariaId || undefined,
     });
 
     const bens = resp.data || [];
     const meta = resp.meta || {};
-
     estado.total      = meta.total ?? 0;
     estado.totalPages = meta.totalPages ?? 0;
-
     totalLabel.textContent = estado.total.toLocaleString('pt-BR');
 
     renderTabela(bens);
     renderPaginacao();
-
   } catch (err) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="8" class="text-center text-muted" style="padding: var(--space-8);">
-          Erro ao carregar bens: ${err.message}. Tente recarregar.
-        </td>
-      </tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-danger">
+      Erro ao carregar: ${err.message}</td></tr>`;
   }
-}
-
-function renderCarregando() {
-  tbody.innerHTML = `
-    <tr>
-      <td colspan="8" class="text-center" style="padding: var(--space-8);">
-        <span class="spinner" aria-label="Carregando..."></span>
-      </td>
-    </tr>`;
 }
 
 function renderTabela(bens) {
   if (!bens.length) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="8" class="text-center text-muted" style="padding: var(--space-8);">
-          Nenhum bem encontrado com os filtros aplicados.
-        </td>
-      </tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted">
+      Nenhum bem encontrado.</td></tr>`;
     return;
   }
 
-  tbody.innerHTML = bens.map((bem) => `
-    <tr onclick="window.location.href='patrimonio-detalhe.html?id=${bem.id}'" title="Ver detalhes de ${bem.descricao}">
+  tbody.innerHTML = bens.map(b => `
+    <tr onclick="window.location.href='patrimonio-detalhe.html?id=${b.id}'" title="${b.descricao}">
+      <td><span class="tombamento-code">${b.tombamento}</span></td>
+      <td class="text-truncate" style="max-width:260px">${b.descricao}</td>
+      <td><span class="badge-estado badge-${b.tipo === 'MOVEL' ? 'movel' : 'imovel'}">${formatTipo(b.tipo)}</span></td>
+      <td class="text-muted">${b.secretaria?.nome ?? '—'}</td>
+      <td><span class="badge-estado badge-${b.estadoConservacao.toLowerCase()}">${formatEstadoConservacao(b.estadoConservacao)}</span></td>
+      <td class="text-muted">${b.valorAquisicao ? formatMoeda(b.valorAquisicao) : '—'}</td>
+      <td class="text-muted">${formatData(b.dataAquisicao)}</td>
       <td>
-        <code style="font-size: var(--font-size-xs); background: var(--color-gray-100); padding: 2px 6px; border-radius: 4px; white-space: nowrap;">
-          ${bem.tombamento}
-        </code>
-      </td>
-      <td class="text-truncate" style="max-width: 280px;">${bem.descricao}</td>
-      <td><span class="badge badge--${bem.tipo.toLowerCase()}">${formatTipo(bem.tipo)}</span></td>
-      <td class="text-muted">${bem.secretaria?.nome ?? '—'}</td>
-      <td><span class="badge badge--${bem.estadoConservacao.toLowerCase()}">${formatEstadoConservacao(bem.estadoConservacao)}</span></td>
-      <td class="text-muted">${bem.valorAquisicao ? formatMoeda(bem.valorAquisicao) : '—'}</td>
-      <td class="text-muted">${formatData(bem.dataAquisicao)}</td>
-      <td>
-        <a href="patrimonio-detalhe.html?id=${bem.id}" class="btn btn-ghost btn-sm" onclick="event.stopPropagation()" title="Ver detalhe">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <a href="patrimonio-detalhe.html?id=${b.id}" class="btn btn-ghost btn-sm" onclick="event.stopPropagation()">
+          <i class="bi bi-eye"></i>
         </a>
       </td>
     </tr>
@@ -170,63 +145,46 @@ function renderTabela(bens) {
 function renderPaginacao() {
   const inicio = ((estado.page - 1) * estado.limit) + 1;
   const fim    = Math.min(estado.page * estado.limit, estado.total);
-
   paginacaoInfo.textContent = estado.total > 0
-    ? `Exibindo ${inicio}–${fim} de ${estado.total.toLocaleString('pt-BR')} bens`
+    ? `${inicio}–${fim} de ${estado.total.toLocaleString('pt-BR')}`
     : 'Nenhum resultado';
 
   paginacaoCtrl.innerHTML = '';
-
   if (estado.totalPages <= 1) return;
 
-  // Botão anterior
-  const btnAnterior = criarBtnPagina('‹', estado.page - 1, estado.page <= 1, 'Página anterior');
-  paginacaoCtrl.appendChild(btnAnterior);
+  paginacaoCtrl.appendChild(criarBtn('‹', estado.page - 1, estado.page <= 1));
 
-  // Páginas visíveis
-  const paginas = paginasVisiveis(estado.page, estado.totalPages);
-  paginas.forEach((p) => {
+  paginasVisiveis(estado.page, estado.totalPages).forEach(p => {
     if (p === '...') {
       const sep = document.createElement('span');
       sep.textContent = '…';
-      sep.style.padding = '0 var(--space-2)';
-      sep.style.color = 'var(--color-gray-400)';
+      sep.style.cssText = 'padding:0 6px;color:#9ca3af;line-height:32px';
       paginacaoCtrl.appendChild(sep);
     } else {
-      const btn = criarBtnPagina(p, p, false, `Página ${p}`);
-      if (p === estado.page) btn.classList.add('is-active');
+      const btn = criarBtn(p, p, false);
+      if (p === estado.page) btn.classList.add('active');
       paginacaoCtrl.appendChild(btn);
     }
   });
 
-  // Botão próximo
-  const btnProximo = criarBtnPagina('›', estado.page + 1, estado.page >= estado.totalPages, 'Próxima página');
-  paginacaoCtrl.appendChild(btnProximo);
+  paginacaoCtrl.appendChild(criarBtn('›', estado.page + 1, estado.page >= estado.totalPages));
 }
 
-function criarBtnPagina(label, pagina, desabilitado, ariaLabel) {
+function criarBtn(label, pagina, disabled) {
   const btn = document.createElement('button');
-  btn.className = 'pagination__btn';
   btn.textContent = label;
-  btn.setAttribute('aria-label', ariaLabel || label);
-  btn.disabled = desabilitado;
-  if (!desabilitado) {
-    btn.addEventListener('click', () => {
-      estado.page = pagina;
-      carregar();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
+  btn.disabled = disabled;
+  if (!disabled) btn.addEventListener('click', () => { estado.page = pagina; carregar(); window.scrollTo({top:0,behavior:'smooth'}); });
   return btn;
 }
 
 function paginasVisiveis(atual, total) {
-  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-  if (atual <= 4) return [1, 2, 3, 4, 5, '...', total];
-  if (atual >= total - 3) return [1, '...', total-4, total-3, total-2, total-1, total];
-  return [1, '...', atual-1, atual, atual+1, '...', total];
+  if (total <= 7) return Array.from({length: total}, (_, i) => i + 1);
+  if (atual <= 4) return [1,2,3,4,5,'...',total];
+  if (atual >= total - 3) return [1,'...',total-4,total-3,total-2,total-1,total];
+  return [1,'...',atual-1,atual,atual+1,'...',total];
 }
 
-// ── Iniciar ────────────────────────────────────────────────────────────────
+// ── Iniciar ───────────────────────────────────────────────────────────
 carregarSecretarias();
 carregar();

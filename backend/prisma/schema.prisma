@@ -94,6 +94,7 @@ model Patrimonio {
   localizacao       String?
   observacoes       String?
   qrCode            String?           @db.Text  // Data URL base64 do QR Code
+  foto              String?
   ativo             Boolean           @default(true)
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt

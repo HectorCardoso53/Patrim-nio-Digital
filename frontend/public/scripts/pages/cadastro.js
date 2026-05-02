@@ -10,6 +10,7 @@ import { formatIniciais }      from '../utils/format.js';
 
 requireRole('ADMIN', 'GESTOR', 'OPERADOR');
 
+// ── Usuário ──────────────────────────────────────────────────────────
 const usuario = getUser();
 if (usuario) {
   document.getElementById('user-name').textContent   = usuario.nome;
@@ -17,20 +18,37 @@ if (usuario) {
   document.getElementById('user-avatar').textContent = formatIniciais(usuario.nome);
 }
 
+// ── Sidebar toggle ───────────────────────────────────────────────────
+const sidebar    = document.getElementById('sidebar');
+const appWrapper = document.getElementById('app-wrapper');
+const overlay    = document.getElementById('sidebar-overlay');
+
 document.getElementById('btn-toggle-sidebar').addEventListener('click', () => {
-  document.getElementById('app-shell').classList.toggle('sidebar-collapsed');
-  document.getElementById('sidebar').classList.toggle('is-collapsed');
+  const isMobile = window.innerWidth <= 1024;
+  if (isMobile) {
+    sidebar.classList.toggle('mobile-open');
+    overlay.classList.toggle('visible');
+  } else {
+    sidebar.classList.toggle('collapsed');
+    appWrapper.classList.toggle('expanded');
+  }
 });
+
+overlay.addEventListener('click', () => {
+  sidebar.classList.remove('mobile-open');
+  overlay.classList.remove('visible');
+});
+
+// ── Logout ───────────────────────────────────────────────────────────
 document.getElementById('btn-logout').addEventListener('click', () => logout());
 
-// Carregar secretarias
+// ── Secretarias ──────────────────────────────────────────────────────
 const selectSecretaria = document.getElementById('secretariaId');
 
 async function carregarSecretarias() {
   try {
     const resp = await api.get('/secretarias');
-    const secretarias = resp.data || [];
-    secretarias.forEach((s) => {
+    (resp.data || []).forEach((s) => {
       const opt = document.createElement('option');
       opt.value = s.id;
       opt.textContent = `${s.sigla} — ${s.nome}`;
@@ -41,7 +59,14 @@ async function carregarSecretarias() {
   }
 }
 
-// Preview da foto
+// ── Máscara de moeda ─────────────────────────────────────────────────
+document.getElementById('valorAquisicao')?.addEventListener('input', function() {
+  let v = this.value.replace(/\D/g, '');
+  v = (parseInt(v || '0') / 100).toFixed(2);
+  this.value = v;
+});
+
+// ── Preview da foto ──────────────────────────────────────────────────
 document.getElementById('foto')?.addEventListener('change', function() {
   const file = this.files[0];
   if (file) {
@@ -54,6 +79,7 @@ document.getElementById('foto')?.addEventListener('change', function() {
   }
 });
 
+// ── Validação ────────────────────────────────────────────────────────
 function validarCampo(id, errId, condicao, mensagem) {
   const campo = document.getElementById(id);
   const erro  = document.getElementById(errId);
@@ -68,13 +94,12 @@ function validarCampo(id, errId, condicao, mensagem) {
 }
 
 function limparErrosCampo(id, errId) {
-  const campo = document.getElementById(id);
-  const erro  = document.getElementById(errId);
-  if (campo) campo.classList.remove('has-error');
-  if (erro)  { erro.textContent = ''; erro.classList.add('is-hidden'); }
+  document.getElementById(id)?.classList.remove('has-error');
+  const erro = document.getElementById(errId);
+  if (erro) { erro.textContent = ''; erro.classList.add('is-hidden'); }
 }
 
-['descricao', 'tipo', 'estadoConservacao', 'secretariaId'].forEach((id) => {
+['descricao', 'tipo', 'estadoConservacao', 'secretariaId'].forEach(id => {
   document.getElementById(id)?.addEventListener('input',  () => limparErrosCampo(id, `err-${id}`));
   document.getElementById(id)?.addEventListener('change', () => limparErrosCampo(id, `err-${id}`));
 });
@@ -84,15 +109,18 @@ function validarFormulario() {
   const tipo      = document.getElementById('tipo').value;
   const estado    = document.getElementById('estadoConservacao').value;
   const secId     = document.getElementById('secretariaId').value;
+  const foto      = document.getElementById('foto').files[0];
 
   const v1 = validarCampo('descricao',        'err-descricao',        descricao.length >= 3, 'Descrição deve ter ao menos 3 caracteres.');
   const v2 = validarCampo('tipo',             'err-tipo',             !!tipo,                'Selecione o tipo do bem.');
   const v3 = validarCampo('estadoConservacao','err-estadoConservacao',!!estado,              'Selecione o estado de conservação.');
   const v4 = validarCampo('secretariaId',     'err-secretariaId',     !!secId,               'Selecione a secretaria detentora.');
+  const v5 = validarCampo('foto',             'err-foto',             !!foto,                'Adicione uma foto do bem.');
 
-  return v1 && v2 && v3 && v4;
+  return v1 && v2 && v3 && v4 && v5;
 }
 
+// ── Payload ──────────────────────────────────────────────────────────
 function montarPayload() {
   const valor = document.getElementById('valorAquisicao').value;
   const data  = document.getElementById('dataAquisicao').value;
@@ -113,13 +141,13 @@ function montarPayload() {
   };
 
   Object.entries(opcional).forEach(([key, val]) => { if (val) payload[key] = val; });
-
-  if (valor) payload.valorAquisicao = parseFloat(valor);
+  if (valor) payload.valorAquisicao = parseFloat(valor.replace(',', '.'));
   if (data)  payload.dataAquisicao  = new Date(data).toISOString();
 
   return payload;
 }
 
+// ── Submit ───────────────────────────────────────────────────────────
 const btnSalvar = document.getElementById('btn-salvar');
 
 btnSalvar.addEventListener('click', async () => {
@@ -136,7 +164,6 @@ btnSalvar.addEventListener('click', async () => {
     const payload    = montarPayload();
     const patrimonio = await patrimonioApi.criar(payload);
 
-    // Upload da foto se houver
     const fotoInput = document.getElementById('foto');
     if (fotoInput?.files[0]) {
       await patrimonioApi.uploadFoto(patrimonio.id, fotoInput.files[0]);
@@ -146,8 +173,8 @@ btnSalvar.addEventListener('click', async () => {
 
   } catch (err) {
     if (err.isValidation && err.errors) {
-      const mensagens = err.errors.map((e) => `• ${e.campo}: ${e.mensagem}`).join('\n');
-      mostrarErroBanner(`Corrija os campos abaixo:\n${mensagens}`);
+      const msgs = err.errors.map(e => `• ${e.campo}: ${e.mensagem}`).join('\n');
+      mostrarErroBanner(`Corrija os campos abaixo:\n${msgs}`);
     } else {
       mostrarErroBanner(err.message || 'Erro ao salvar o bem. Tente novamente.');
     }
@@ -157,11 +184,12 @@ btnSalvar.addEventListener('click', async () => {
   }
 });
 
+// ── Helpers UI ───────────────────────────────────────────────────────
 function setCarregando(ativo) {
-  btnSalvar.disabled    = ativo;
-  btnSalvar.textContent = ativo ? 'Salvando...' : 'Salvar e Tombar Bem';
-  if (ativo) btnSalvar.classList.add('is-loading');
-  else       btnSalvar.classList.remove('is-loading');
+  btnSalvar.disabled = ativo;
+  btnSalvar.innerHTML = ativo
+    ? '<span class="spinner-border spinner-border-sm me-2"></span>Salvando...'
+    : '<i class="bi bi-floppy me-2"></i>Salvar e Tombar Bem';
 }
 
 function mostrarErroBanner(mensagem) {
@@ -169,12 +197,15 @@ function mostrarErroBanner(mensagem) {
   banner.style.whiteSpace = 'pre-line';
   banner.textContent = mensagem;
   banner.classList.remove('is-hidden');
+  banner.classList.add('visible');
 }
 
 function limparErroBanner() {
   const banner = document.getElementById('form-error-banner');
   banner.textContent = '';
   banner.classList.add('is-hidden');
+  banner.classList.remove('visible');
 }
 
+// ── Iniciar ───────────────────────────────────────────────────────────
 carregarSecretarias();

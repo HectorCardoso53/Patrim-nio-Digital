@@ -1,6 +1,5 @@
 <!doctype html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,567 +9,182 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="../styles/global.css" />
   <link rel="stylesheet" href="../styles/components.css" />
-  <style>
-    :root {
-      --sidebar-width: 240px;
-      --sidebar-bg: #0d1b2a;
-      --sidebar-hover: #1a3a5c;
-      --sidebar-active: #1e5f8e
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0
-    }
-
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f0f2f5;
-      color: #1a1a2e
-    }
-
-    .sidebar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: var(--sidebar-width);
-      height: 100vh;
-      background: var(--sidebar-bg);
-      display: flex;
-      flex-direction: column;
-      z-index: 100;
-      transition: width .25s;
-      overflow: hidden
-    }
-
-    .sidebar.collapsed {
-      width: 60px
-    }
-
-    .sidebar.collapsed .sidebar-label,
-    .sidebar.collapsed .brand-text,
-    .sidebar.collapsed .nav-section,
-    .sidebar.collapsed .user-info {
-      display: none
-    }
-
-    .sidebar.collapsed .brand-logo {
-      margin: 0 auto
-    }
-
-    .sidebar-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 16px 14px;
-      border-bottom: 1px solid rgba(255, 255, 255, .08);
-      min-height: 72px
-    }
-
-    .brand-logo {
-      width: 40px;
-      height: 40px;
-      object-fit: contain;
-      flex-shrink: 0;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, .08);
-      padding: 4px
-    }
-
-    .brand-text .brand-name {
-      font-size: .9rem;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1.2
-    }
-
-    .brand-text .brand-sub {
-      font-size: .72rem;
-      color: rgba(255, 255, 255, .5)
-    }
-
-    .sidebar-nav {
-      flex: 1;
-      padding: 12px 8px;
-      overflow-y: auto
-    }
-
-    .nav-section {
-      font-size: .65rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: rgba(255, 255, 255, .35);
-      padding: 10px 8px 4px
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 10px;
-      border-radius: 8px;
-      color: rgba(255, 255, 255, .7);
-      text-decoration: none;
-      font-size: .875rem;
-      font-weight: 500;
-      transition: background .15s, color .15s;
-      margin-bottom: 2px
-    }
-
-    .nav-item:hover {
-      background: var(--sidebar-hover);
-      color: #fff
-    }
-
-    .nav-item.active {
-      background: var(--sidebar-active);
-      color: #fff
-    }
-
-    .nav-item i {
-      font-size: 1rem;
-      flex-shrink: 0;
-      width: 20px;
-      text-align: center
-    }
-
-    .sidebar-footer {
-      padding: 12px 14px;
-      border-top: 1px solid rgba(255, 255, 255, .08);
-      display: flex;
-      align-items: center;
-      gap: 10px
-    }
-
-    .user-avatar {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: var(--sidebar-active);
-      color: #fff;
-      font-size: .75rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0
-    }
-
-    .user-info .user-name {
-      font-size: .8rem;
-      font-weight: 600;
-      color: #fff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 150px
-    }
-
-    .user-info .user-papel {
-      font-size: .68rem;
-      color: rgba(255, 255, 255, .45)
-    }
-
-    .app-wrapper {
-      margin-left: var(--sidebar-width);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      transition: margin-left .25s
-    }
-
-    .app-wrapper.expanded {
-      margin-left: 60px
-    }
-
-    .app-header {
-      position: sticky;
-      top: 0;
-      height: 56px;
-      background: #fff;
-      border-bottom: 1px solid #e5e7eb;
-      display: flex;
-      align-items: center;
-      padding: 0 24px;
-      gap: 12px;
-      z-index: 90;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, .06)
-    }
-
-    .btn-toggle {
-      background: none;
-      border: none;
-      padding: 6px;
-      border-radius: 6px;
-      cursor: pointer;
-      color: #6b7280;
-      font-size: 1.2rem;
-      transition: background .15s
-    }
-
-    .btn-toggle:hover {
-      background: #f3f4f6
-    }
-
-    .header-title {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #111827;
-      flex: 1
-    }
-
-    .btn-logout {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 14px;
-      border: 1.5px solid #e5e7eb;
-      border-radius: 8px;
-      background: #fff;
-      color: #374151;
-      font-size: .85rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all .15s
-    }
-
-    .btn-logout:hover {
-      background: #fef2f2;
-      border-color: #fca5a5;
-      color: #dc2626
-    }
-
-    .app-content {
-      flex: 1;
-      padding: 28px 28px 40px
-    }
-
-    .page-title {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: #111827
-    }
-
-    .page-subtitle {
-      font-size: .85rem;
-      color: #6b7280;
-      margin-top: 2px
-    }
-
-    .form-card {
-      background: #fff;
-      border-radius: 12px;
-      border: 1px solid #e5e7eb;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, .06);
-      margin-bottom: 20px;
-      overflow: hidden
-    }
-
-    .form-card-header {
-      padding: 14px 20px;
-      border-bottom: 1px solid #f3f4f6;
-      background: #f9fafb
-    }
-
-    .form-card-header h3 {
-      font-size: .95rem;
-      font-weight: 600;
-      color: #111827;
-      margin: 0
-    }
-
-    .form-card-body {
-      padding: 20px
-    }
-
-    .form-label {
-      font-size: .85rem;
-      font-weight: 500;
-      color: #374151;
-      margin-bottom: 4px
-    }
-
-    .form-label .req {
-      color: #dc2626
-    }
-
-    .form-control,
-    .form-select {
-      border-radius: 8px;
-      border: 1.5px solid #dee2e6;
-      font-size: .9rem;
-      transition: border-color .2s, box-shadow .2s
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-      border-color: #1a3a5c;
-      box-shadow: 0 0 0 3px rgba(26, 58, 92, .12)
-    }
-
-    .form-hint {
-      font-size: .78rem;
-      color: #9ca3af;
-      margin-top: 3px
-    }
-
-    .form-error {
-      font-size: .78rem;
-      color: #dc2626;
-      margin-top: 3px;
-      display: none
-    }
-
-    .form-error.visible {
-      display: block
-    }
-
-    .form-control.is-invalid {
-      border-color: #dc2626
-    }
-
-    .error-banner {
-      background: #fef2f2;
-      border: 1px solid #fca5a5;
-      border-radius: 8px;
-      padding: 12px 16px;
-      color: #991b1b;
-      font-size: .875rem;
-      margin-bottom: 20px;
-      display: none
-    }
-
-    .error-banner.visible {
-      display: block
-    }
-
-    .breadcrumb-nav {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: .82rem;
-      color: #6b7280;
-      margin-bottom: 16px
-    }
-
-    .breadcrumb-nav a {
-      color: #1a3a5c;
-      text-decoration: none
-    }
-
-    .breadcrumb-nav a:hover {
-      text-decoration: underline
-    }
-
-    .breadcrumb-nav .sep {
-      color: #d1d5db
-    }
-
-    .actions-bar {
-      display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-      padding-top: 4px
-    }
-  </style>
+  <link rel="stylesheet" href="../styles/cadastro.css" />
 </head>
-
 <body>
 
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-brand">
-      <img src="../assets/logo.png" alt="Logo Prefeitura" class="brand-logo" />
-      <div class="brand-text">
-        <div class="brand-name">Patrimônio Inteligente</div>
-        <div class="brand-sub">Oriximiná/PA</div>
-      </div>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <img src="../assets/logo.png" alt="Logo Prefeitura" class="brand-logo" />
+    <div class="brand-text">
+      <div class="brand-name">Patrimônio Inteligente</div>
+      <div class="brand-sub">Oriximiná/PA</div>
     </div>
-    <nav class="sidebar-nav">
-      <div class="nav-section sidebar-label">Menu Principal</div>
-      <a href="dashboard.html" class="nav-item"><i class="bi bi-grid-1x2-fill"></i><span
-          class="sidebar-label">Dashboard</span></a>
-      <div class="nav-section sidebar-label">Patrimônio</div>
-      <a href="patrimonio-listagem.html" class="nav-item"><i class="bi bi-clipboard2-data"></i><span
-          class="sidebar-label">Bens Patrimoniais</span></a>
-      <a href="patrimonio-cadastro.html" class="nav-item active"><i class="bi bi-plus-circle"></i><span
-          class="sidebar-label">Novo Tombamento</span></a>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="user-avatar" id="user-avatar">--</div>
-      <div class="user-info">
-        <div class="user-name" id="user-name">Carregando...</div>
-        <div class="user-papel" id="user-papel"></div>
-      </div>
-    </div>
-  </aside>
-
-  <div class="app-wrapper" id="app-wrapper">
-    <header class="app-header">
-      <button class="btn-toggle" id="btn-toggle-sidebar"><i class="bi bi-list"></i></button>
-      <span class="header-title">Novo Tombamento</span>
-      <button class="btn-logout" id="btn-logout"><i class="bi bi-box-arrow-right"></i> Sair</button>
-    </header>
-
-    <main class="app-content">
-
-      <!-- Breadcrumb -->
-      <div class="breadcrumb-nav">
-        <a href="dashboard.html">Início</a>
-        <span class="sep">/</span>
-        <a href="patrimonio-listagem.html">Bens Patrimoniais</a>
-        <span class="sep">/</span>
-        <span>Novo Tombamento</span>
-      </div>
-
-      <div class="mb-4">
-        <h2 class="page-title">Cadastrar Novo Bem</h2>
-        <p class="page-subtitle">Preencha os dados do bem a ser tombado. O número de tombamento e QR Code serão gerados
-          automaticamente.</p>
-      </div>
-
-      <!-- Banner de erro -->
-      <div id="form-error-banner" class="error-banner" role="alert"></div>
-
-      <!-- Card 1: Identificação -->
-      <div class="form-card">
-        <div class="form-card-header">
-          <h3><i class="bi bi-tag me-2 text-primary"></i>Identificação do Bem</h3>
-        </div>
-        <div class="form-card-body">
-          <div class="row g-3">
-            <div class="col-12">
-              <label class="form-label" for="descricao">Descrição do Bem <span class="req">*</span></label>
-              <input type="text" id="descricao" class="form-control"
-                placeholder="Ex.: Mesa de escritório em madeira, 4 gavetas" maxlength="255" />
-              <div class="form-error" id="err-descricao"></div>
-            </div>
-            <div class="col-6 col-md-4">
-              <label class="form-label" for="tipo">Tipo <span class="req">*</span></label>
-              <select id="tipo" class="form-select">
-                <option value="">Selecione...</option>
-                <option value="MOVEL">Móvel</option>
-                <option value="IMOVEL">Imóvel</option>
-              </select>
-              <div class="form-error" id="err-tipo"></div>
-            </div>
-            <div class="col-6 col-md-4">
-              <label class="form-label" for="estadoConservacao">Estado de Conservação <span class="req">*</span></label>
-              <select id="estadoConservacao" class="form-select">
-                <option value="">Selecione...</option>
-                <option value="OTIMO">Ótimo</option>
-                <option value="BOM">Bom</option>
-                <option value="REGULAR">Regular</option>
-                <option value="RUIM">Ruim</option>
-                <option value="INSERVIVEL">Inservível</option>
-              </select>
-              <div class="form-error" id="err-estadoConservacao"></div>
-            </div>
-            <div class="col-6 col-md-4">
-              <label class="form-label" for="marca">Marca</label>
-              <input type="text" id="marca" class="form-control" placeholder="Ex.: Dell, Honda" />
-            </div>
-            <div class="col-6 col-md-4">
-              <label class="form-label" for="modelo">Modelo</label>
-              <input type="text" id="modelo" class="form-control" placeholder="Ex.: Inspiron 15" />
-            </div>
-            <div class="col-6 col-md-4">
-              <label class="form-label" for="numeroSerie">Número de Série</label>
-              <input type="text" id="numeroSerie" class="form-control" placeholder="Nº do fabricante" />
-            </div>
-            <div class="col-6 col-md-4">
-              <label class="form-label" for="valorAquisicao">Valor de Aquisição (R$)</label>
-              <input type="number" id="valorAquisicao" class="form-control" placeholder="0,00" min="0" step="0.01" />
-              <div class="form-hint">Valor da nota fiscal ou contrato.</div>
-            </div>
-            <div class="col-6 col-md-4">
-              <label class="form-label" for="dataAquisicao">Data de Aquisição</label>
-              <input type="date" id="dataAquisicao" class="form-control" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 2: Localização -->
-      <div class="form-card">
-        <div class="form-card-header">
-          <h3><i class="bi bi-geo-alt me-2 text-primary"></i>Localização e Responsabilidade</h3>
-        </div>
-        <div class="form-card-body">
-          <div class="row g-3">
-            <div class="col-12 col-md-6">
-              <label class="form-label" for="secretariaId">Secretaria Detentora <span class="req">*</span></label>
-              <select id="secretariaId" class="form-select">
-                <option value="">Selecione a secretaria...</option>
-              </select>
-              <div class="form-error" id="err-secretariaId"></div>
-            </div>
-            <div class="col-12 col-md-6">
-              <label class="form-label" for="localizacao">Localização Física</label>
-              <input type="text" id="localizacao" class="form-control"
-                placeholder="Ex.: Sala 12, 2º andar — Prédio da Prefeitura" />
-            </div>
-            <div class="col-12">
-              <label class="form-label" for="observacoes">Observações</label>
-              <textarea id="observacoes" class="form-control" rows="3"
-                placeholder="Informações adicionais sobre o bem..."></textarea>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 3: Foto do Bem -->
-      <div class="form-card">
-        <div class="form-card-header">
-          <h3><i class="bi bi-camera me-2 text-primary"></i>Foto do Bem</h3>
-        </div>
-        <div class="form-card-body">
-          <div class="row g-3">
-            <div class="col-12">
-              <label class="form-label" for="foto">Imagem do bem (JPG, PNG ou WEBP — máx. 5MB)</label>
-              <input type="file" id="foto" class="form-control" accept="image/jpeg,image/png,image/webp" />
-              <div class="form-hint">A foto aparecerá na página pública ao escanear o QR Code.</div>
-            </div>
-            <div class="col-12" id="foto-preview-container" style="display:none">
-              <img id="foto-preview" src="" alt="Preview"
-                style="max-height:200px;border-radius:8px;border:1px solid #e5e7eb;" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Ações -->
-      <div class="actions-bar">
-        <a href="patrimonio-listagem.html" class="btn btn-outline-secondary" style="border-radius:8px">Cancelar</a>
-        <button id="btn-salvar" class="btn btn-primary" type="button" style="border-radius:8px;padding:8px 20px">
-          <i class="bi bi-floppy me-2"></i>Salvar e Tombar Bem
-        </button>
-      </div>
-
-    </main>
   </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section sidebar-label">Menu Principal</div>
+    <a href="dashboard.html" class="nav-item"><i class="bi bi-grid-1x2-fill"></i><span class="sidebar-label">Dashboard</span></a>
+    <div class="nav-section sidebar-label">Patrimônio</div>
+    <a href="patrimonio-listagem.html" class="nav-item"><i class="bi bi-clipboard2-data"></i><span class="sidebar-label">Bens Patrimoniais</span></a>
+    <a href="patrimonio-cadastro.html" class="nav-item active"><i class="bi bi-plus-circle"></i><span class="sidebar-label">Novo Tombamento</span></a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-avatar" id="user-avatar">--</div>
+    <div class="user-info">
+      <div class="user-name" id="user-name">Carregando...</div>
+      <div class="user-papel" id="user-papel"></div>
+    </div>
+  </div>
+</aside>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script type="module" src="../scripts/pages/cadastro.js"></script>
-  <script>
-    document.getElementById('btn-toggle-sidebar').addEventListener('click', () => {
-      document.getElementById('sidebar').classList.toggle('collapsed');
-      document.getElementById('app-wrapper').classList.toggle('expanded');
-    });
+<div class="app-wrapper" id="app-wrapper">
+  <header class="app-header">
+    <button class="btn-toggle" id="btn-toggle-sidebar" aria-label="Abrir/fechar menu">
+      <i class="bi bi-list"></i>
+    </button>
+    <span class="header-title">Novo Tombamento</span>
+    <button class="btn-logout" id="btn-logout">
+      <i class="bi bi-box-arrow-right"></i>
+      <span>Sair</span>
+    </button>
+  </header>
 
-    document.getElementById('foto').addEventListener('change', function () {
-      const file = this.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = e => {
-          document.getElementById('foto-preview').src = e.target.result;
-          document.getElementById('foto-preview-container').style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-  </script>
+  <main class="app-content">
+
+    <div class="breadcrumb-nav">
+      <a href="dashboard.html">Início</a>
+      <span class="sep">/</span>
+      <a href="patrimonio-listagem.html">Bens Patrimoniais</a>
+      <span class="sep">/</span>
+      <span>Novo Tombamento</span>
+    </div>
+
+    <div class="mb-4">
+      <h2 class="page-title">Cadastrar Novo Bem</h2>
+      <p class="page-subtitle">Preencha os dados do bem a ser tombado. O número de tombamento e QR Code serão gerados automaticamente.</p>
+    </div>
+
+    <div id="form-error-banner" class="error-banner" role="alert"></div>
+
+    <!-- Card 1: Identificação -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <h3><i class="bi bi-tag me-2 text-primary"></i>Identificação do Bem</h3>
+      </div>
+      <div class="form-card-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label" for="descricao">Descrição do Bem <span class="req">*</span></label>
+            <input type="text" id="descricao" class="form-control" placeholder="Ex.: Mesa de escritório em madeira, 4 gavetas" maxlength="255" />
+            <div class="form-error" id="err-descricao"></div>
+          </div>
+          <div class="col-6 col-md-4">
+            <label class="form-label" for="tipo">Tipo <span class="req">*</span></label>
+            <select id="tipo" class="form-select">
+              <option value="">Selecione...</option>
+              <option value="MOVEL">Móvel</option>
+              <option value="IMOVEL">Imóvel</option>
+            </select>
+            <div class="form-error" id="err-tipo"></div>
+          </div>
+          <div class="col-6 col-md-4">
+            <label class="form-label" for="estadoConservacao">Estado de Conservação <span class="req">*</span></label>
+            <select id="estadoConservacao" class="form-select">
+              <option value="">Selecione...</option>
+              <option value="OTIMO">Ótimo</option>
+              <option value="BOM">Bom</option>
+              <option value="REGULAR">Regular</option>
+              <option value="RUIM">Ruim</option>
+              <option value="INSERVIVEL">Inservível</option>
+            </select>
+            <div class="form-error" id="err-estadoConservacao"></div>
+          </div>
+          <div class="col-6 col-md-4">
+            <label class="form-label" for="marca">Marca</label>
+            <input type="text" id="marca" class="form-control" placeholder="Ex.: Dell, Honda" />
+          </div>
+          <div class="col-6 col-md-4">
+            <label class="form-label" for="modelo">Modelo</label>
+            <input type="text" id="modelo" class="form-control" placeholder="Ex.: Inspiron 15" />
+          </div>
+          <div class="col-6 col-md-4">
+            <label class="form-label" for="numeroSerie">Número de Série</label>
+            <input type="text" id="numeroSerie" class="form-control" placeholder="Nº do fabricante" />
+          </div>
+          <div class="col-6 col-md-4">
+            <label class="form-label" for="valorAquisicao">Valor de Aquisição (R$)</label>
+            <input type="text" id="valorAquisicao" class="form-control" placeholder="0,00" inputmode="numeric" />
+            <div class="form-hint">Valor da nota fiscal ou contrato.</div>
+          </div>
+          <div class="col-6 col-md-4">
+            <label class="form-label" for="dataAquisicao">Data de Aquisição</label>
+            <input type="date" id="dataAquisicao" class="form-control" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Localização -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <h3><i class="bi bi-geo-alt me-2 text-primary"></i>Localização e Responsabilidade</h3>
+      </div>
+      <div class="form-card-body">
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <label class="form-label" for="secretariaId">Secretaria Detentora <span class="req">*</span></label>
+            <select id="secretariaId" class="form-select">
+              <option value="">Selecione a secretaria...</option>
+            </select>
+            <div class="form-error" id="err-secretariaId"></div>
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label" for="localizacao">Localização Física</label>
+            <input type="text" id="localizacao" class="form-control" placeholder="Ex.: Sala 12, 2º andar — Prédio da Prefeitura" />
+          </div>
+          <div class="col-12">
+            <label class="form-label" for="observacoes">Observações</label>
+            <textarea id="observacoes" class="form-control" rows="3" placeholder="Informações adicionais sobre o bem..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Foto -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <h3><i class="bi bi-camera me-2 text-primary"></i>Foto do Bem</h3>
+      </div>
+      <div class="form-card-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label" for="foto">Imagem do bem (JPG, PNG ou WEBP — máx. 5MB)</label>
+            <input type="file" id="foto" class="form-control" accept="image/jpeg,image/png,image/webp" />
+            <div class="form-error" id="err-foto"></div>
+            <div class="form-hint">A foto aparecerá na página pública ao escanear o QR Code.</div>
+          </div>
+          <div class="col-12" id="foto-preview-container" style="display:none">
+            <img id="foto-preview" src="" alt="Preview" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ações -->
+    <div class="actions-bar">
+      <a href="patrimonio-listagem.html" class="btn btn-outline-secondary" style="border-radius:8px">Cancelar</a>
+      <button id="btn-salvar" class="btn btn-primary" type="button" style="border-radius:8px;padding:8px 20px">
+        <i class="bi bi-floppy me-2"></i>Salvar e Tombar Bem
+      </button>
+    </div>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module" src="../scripts/pages/cadastro.js"></script>
+
 </body>
-
 </html>
